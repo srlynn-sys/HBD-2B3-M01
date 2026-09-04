@@ -1,0 +1,42 @@
+name: Refine shooting stars
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  refine:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch shooting stars
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          if 'realMeteorV2' in s:
+              raise SystemExit(0)
+          old_css=""".shoot{position:absolute;width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 12px 5px #fff6a8,0 0 25px 7px #ffe46b;opacity:0;z-index:18}.shoot:before{content:'';position:absolute;left:50%;bottom:3px;width:6px;height:145px;border-radius:50%;background:linear-gradient(to top,#fffde8 0%,#ffe77a 24%,#ffcf4c66 58%,transparent 100%);transform:translateX(-50%) rotate(var(--tail));transform-origin:bottom center;filter:blur(.45px)}.shoot:after{content:'';position:absolute;left:50%;bottom:0;width:22px;height:22px;border-radius:50%;background:#fff8b0;transform:translate(-50%,50%);filter:blur(7px);opacity:.7}.shoot.go{animation:shootCurve 2.8s cubic-bezier(.18,.68,.2,1) forwards}.shoot.fast{animation-duration:2s}.shoot.long:before{height:210px;width:5px}.shoot.big{width:11px;height:11px}.comet{position:absolute;width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 14px 5px #fff,0 0 30px 10px #6fdfff;opacity:0;z-index:17}.comet:after{content:'';position:absolute;right:3px;top:50%;width:170px;height:3px;border-radius:50%;background:linear-gradient(to left,#fff,#66d9ff66,transparent);transform:translateY(-50%) rotate(-18deg);transform-origin:right center}.comet.go{animation:cometAcross 2.7s ease-in-out forwards}"""
+          new_css=""".shoot{position:absolute;width:9px;height:9px;border-radius:50%;background:#fff;box-shadow:0 0 12px 4px #fff,0 0 28px 9px #ffe76b;opacity:0;z-index:18;will-change:left,top,transform,opacity}.shoot:before{content:'';position:absolute;right:3px;top:50%;width:180px;height:5px;border-radius:999px;background:linear-gradient(to left,rgba(255,255,255,.98),rgba(255,231,122,.8) 28%,rgba(255,196,75,.3) 62%,transparent);transform:translateY(-50%);transform-origin:right center;filter:blur(.45px)}.shoot.down:before{right:auto;left:50%;top:auto;bottom:4px;width:5px;height:190px;background:linear-gradient(to top,rgba(255,255,255,.98),rgba(255,231,122,.75) 30%,rgba(255,196,75,.25) 62%,transparent);transform:translateX(-50%)}.shoot.curve:before{width:220px;height:6px;right:2px;background:linear-gradient(to left,rgba(255,255,255,.98),rgba(255,221,105,.72) 30%,rgba(255,174,61,.2) 66%,transparent);transform:translateY(-50%) rotate(-12deg)}.shoot.go{animation:meteorRTL 2.15s cubic-bezier(.18,.72,.16,1) forwards}.shoot.down.go{animation:meteorDown 1.7s cubic-bezier(.2,.72,.12,1) forwards}.shoot.curve.go{animation:meteorCurve 2.35s cubic-bezier(.16,.76,.16,1) forwards}.shoot.fast{animation-duration:1.45s}.shoot.long:before{width:270px}.shoot.down.long:before{height:260px}.shoot.big{width:12px;height:12px}.comet{position:absolute;width:7px;height:7px;border-radius:50%;background:#fff;box-shadow:0 0 16px 6px #fff,0 0 36px 12px #6fdfff;opacity:0;z-index:17}.comet:after{content:'';position:absolute;right:3px;top:50%;width:230px;height:5px;border-radius:999px;background:linear-gradient(to left,#fff,#66d9ff99,transparent);transform:translateY(-50%) rotate(-8deg);transform-origin:right center}.comet.go{animation:cometAcross 2.35s cubic-bezier(.2,.65,.15,1) forwards}"""
+          if old_css not in s: raise SystemExit('CSS block not found')
+          s=s.replace(old_css,new_css,1)
+          old_anim="""@keyframes shootCurve{0%{opacity:0;transform:translate(0,0) scale(.35) rotate(0)}8%{opacity:1}32%{opacity:1;transform:translate(calc(var(--sx)*.25),calc(var(--sy)*.22)) rotate(18deg) scale(.75)}58%{opacity:1;transform:translate(calc(var(--sx)*.65),calc(var(--sy)*.55)) rotate(38deg) scale(1)}82%{opacity:1}100%{opacity:0;transform:translate(var(--sx),var(--sy)) scale(1.35) rotate(55deg)}}@keyframes cometAcross{0%{opacity:0;transform:translate(-10vw,-10vh) rotate(-12deg) scale(.5)}10%{opacity:1}45%{opacity:1;transform:translate(40vw,30vh) rotate(-12deg) scale(1)}75%{opacity:1;transform:translate(80vw,62vh) rotate(-12deg) scale(1.1)}100%{opacity:0;transform:translate(112vw,88vh) rotate(-12deg) scale(.7)}}"""
+          new_anim="""@keyframes meteorRTL{0%{opacity:0;left:108%;top:10%;transform:scale(.25) rotate(0)}8%{opacity:1;transform:scale(1)}35%{left:78%;top:18%;transform:scale(1.05)}68%{left:42%;top:28%;transform:scale(1.12)}100%{opacity:0;left:-18%;top:40%;transform:scale(.75)}}@keyframes meteorDown{0%{opacity:0;left:15%;top:-14%;transform:scale(.25)}8%{opacity:1;transform:scale(1)}38%{left:25%;top:30%;transform:scale(1.05)}72%{left:38%;top:70%;transform:scale(1.1)}100%{opacity:0;left:48%;top:115%;transform:scale(.7)}}@keyframes meteorCurve{0%{opacity:0;left:112%;top:8%;transform:scale(.25)}8%{opacity:1;transform:scale(1)}25%{left:86%;top:17%;transform:rotate(-12deg) scale(1.05)}45%{left:63%;top:8%;transform:rotate(12deg) scale(1.08)}65%{left:38%;top:24%;transform:rotate(-10deg) scale(1.1)}82%{left:15%;top:13%;transform:rotate(12deg) scale(1)}100%{opacity:0;left:-18%;top:31%;transform:scale(.7)}}@keyframes cometAcross{0%{opacity:0;transform:translate(12vw,-10vh) rotate(-8deg) scale(.35)}10%{opacity:1}42%{opacity:1;transform:translate(-18vw,24vh) rotate(-8deg) scale(1)}72%{opacity:1;transform:translate(-54vw,52vh) rotate(-8deg) scale(1.1)}100%{opacity:0;transform:translate(-112vw,86vh) rotate(-8deg) scale(.7)}}"""
+          if old_anim not in s: raise SystemExit('animation block not found')
+          s=s.replace(old_anim,new_anim,1)
+          a=s.index('function shootingStars()')
+          b=s.index('function firework(',a)
+          fn="""function shootingStars(){const count=innerWidth<600?42:68;for(let i=0;i<count;i++)setTimeout(()=>{const r=Math.random();const s=document.createElement('i');s.className='shoot go '+(r<.28?'down':r<.58?'curve':'')+' '+(Math.random()>.72?'long ':'')+(Math.random()>.84?'big':'');s.style.setProperty('--tail',(-18+Math.random()*36)+'deg');page2.appendChild(s);tone(850+Math.random()*700,.08,'sine',.008);setTimeout(()=>s.remove(),2600)},i*135+Math.random()*260);for(let i=0;i<10;i++)setTimeout(()=>{const c=document.createElement('i');c.className='comet go';c.style.left=(15+Math.random()*70)+'%';c.style.top=(-8+Math.random()*20)+'%';page2.appendChild(c);tone(700+Math.random()*300,.14,'triangle',.012);setTimeout(()=>c.remove(),2700)},i*700+300)}
+          """
+          s=s[:a]+fn+s[b:]
+          p.write_text(s)
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Make shooting stars fall and streak cleanly across sky' || exit 0
+          git push
