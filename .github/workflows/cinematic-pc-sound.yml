@@ -1,0 +1,100 @@
+name: Cinematic Birthday Upgrade
+on:
+  push:
+    paths:
+      - '.github/workflows/cinematic-pc-sound.yml'
+jobs:
+  upgrade:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Upgrade birthday experience
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          css=r'''<style id="cinematic-upgrade">
+          html,body{background:#02040f}
+          .scene{background:radial-gradient(circle at 50% 12%,#fffdf8 0,#f8dfe8 38%,#dca9bb 100%)}
+          .scene:after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 48%,transparent 35%,#30101d18 100%);z-index:2}
+          .photo{top:2%;width:min(54vw,520px);height:min(54vw,520px);opacity:.82;box-shadow:0 0 0 10px #ffffff2b,0 0 55px #ffbfd044,0 30px 80px #4b132c30}
+          .cake-wrap{z-index:8;transform:translateY(5vh) scale(1.02)}
+          .hint{z-index:20;bottom:5%;box-shadow:0 12px 30px #4b173322;backdrop-filter:blur(8px)}
+          .page2{background:radial-gradient(circle at 50% 48%,#273b83 0,#0b1238 48%,#02030d 100%);}
+          .page2.show{animation:cinematicSky .9s ease both}
+          @keyframes cinematicSky{from{opacity:0;filter:brightness(.35) blur(7px);transform:scale(1.06)}to{opacity:1;filter:none;transform:scale(1)}}
+          .story{top:50%!important;left:50%!important;transform:translate(-50%,-50%)!important;width:min(980px,82vw)!important;padding:28px 42px!important;border:1px solid #ffffff20!important;border-radius:28px!important;background:linear-gradient(135deg,#07102d99,#16275e66)!important;backdrop-filter:blur(10px)!important;font-family:system-ui,"Noto Sans Myanmar",sans-serif!important;font-size:clamp(24px,2.7vw,42px)!important;line-height:1.7!important;font-weight:800!important;letter-spacing:0!important;color:#fff!important;text-align:center!important;text-shadow:0 0 12px #fff,0 0 34px #9fc7ff,0 8px 30px #000!important;box-shadow:0 18px 70px #0005!important;opacity:0!important}
+          .story.show{animation:cinematicStory 1.4s cubic-bezier(.2,.8,.2,1) forwards!important}
+          @keyframes cinematicStory{0%{opacity:0;transform:translate(-50%,-44%) scale(.88);filter:blur(14px)}55%{opacity:1;transform:translate(-50%,-51%) scale(1.025);filter:blur(0)}100%{opacity:1;transform:translate(-50%,-50%) scale(1);filter:none}}
+          .memory-layer{position:absolute;inset:0;z-index:70;pointer-events:none;overflow:hidden;opacity:0;transition:opacity .8s ease;background:transparent}
+          .memory-layer.on{opacity:1}
+          .memory-vignette{position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,transparent 25%,#0008 100%)}
+          .memory-title{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.92);width:min(1050px,86vw);padding:24px 38px;text-align:center;font-family:system-ui,"Noto Sans Myanmar",sans-serif;font-weight:900;font-size:clamp(25px,3vw,48px);line-height:1.65;color:#fff;text-shadow:0 0 12px #fff,0 0 38px #70b8ff,0 8px 35px #000;opacity:0;transition:all 1.1s cubic-bezier(.2,.8,.2,1)}
+          .memory-title.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+          .wish-star{position:absolute;width:9px;height:9px;border-radius:50%;background:#fff;box-shadow:0 0 12px 4px #fff,0 0 30px 10px #ffe26b;animation:wishRise 3.2s cubic-bezier(.15,.8,.2,1) forwards}
+          @keyframes wishRise{0%{opacity:0;transform:translate(0,20vh) scale(.2)}12%{opacity:1}70%{opacity:1}100%{opacity:0;transform:translate(var(--wx),-70vh) scale(1.2)}}
+          .gift{position:absolute;font-size:clamp(28px,4vw,52px);opacity:0;filter:drop-shadow(0 5px 12px #0006);animation:giftFly 5s ease-out forwards}
+          @keyframes giftFly{0%{opacity:0;transform:translate(-15vw,25vh) rotate(-20deg) scale(.5)}12%{opacity:1}75%{opacity:1;transform:translate(55vw,-8vh) rotate(12deg) scale(1)}100%{opacity:0;transform:translate(115vw,-28vh) rotate(25deg) scale(.75)}}
+          .heart-spark{position:absolute;color:#ff9fc2;font-size:18px;opacity:0;animation:heartSpark 2.8s ease-out forwards}
+          @keyframes heartSpark{0%{opacity:0;transform:scale(.2) translateY(20px)}20%{opacity:1}100%{opacity:0;transform:scale(1.5) translateY(-120px)}}
+          .final-name{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.5);font-family:system-ui,"Noto Sans Myanmar",sans-serif;font-size:clamp(38px,6vw,86px);font-weight:1000;color:#ffe9a6;text-align:center;text-shadow:0 0 15px #fff,0 0 45px #ffd45c,0 10px 40px #000;opacity:0;white-space:nowrap}
+          .final-name.show{animation:finalName 2s cubic-bezier(.15,.8,.2,1) forwards}
+          @keyframes finalName{0%{opacity:0;transform:translate(-50%,-50%) scale(.5);filter:blur(14px)}55%{opacity:1;transform:translate(-50%,-50%) scale(1.08);filter:none}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+          .final-ring{position:absolute;left:50%;top:50%;width:min(60vw,680px);height:min(60vw,680px);border:2px solid #ffe89a66;border-radius:50%;transform:translate(-50%,-50%) scale(.2);opacity:0;box-shadow:0 0 40px #ffd85c55,inset 0 0 40px #ffd85c22}
+          .final-ring.show{animation:ringExpand 2.8s ease-out forwards}
+          @keyframes ringExpand{0%{opacity:0;transform:translate(-50%,-50%) scale(.2)}20%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1.25)}}
+          @media(min-width:900px){.cake-wrap{transform:translateY(7vh) scale(1.08)}.hint{font-size:17px}.memory-title{letter-spacing:.2px}}
+          @media(max-width:600px){.photo{top:4%;width:72vw;height:72vw}.cake-wrap{transform:translateY(4vh) scale(.94)}.story{width:88vw!important;padding:18px 15px!important;font-size:clamp(20px,5.2vw,29px)!important;border-radius:20px!important}.memory-title{width:90vw;padding:18px 14px;font-size:clamp(20px,5.5vw,29px)}}
+          </style>'''
+          js=r'''<script id="cinematic-upgrade-js">
+          (()=>{
+            const run=()=>{
+              if(window.__cinematicUpgrade)return; window.__cinematicUpgrade=true;
+              const page=document.querySelector('.page2'); const cake=document.querySelector('.cake-wrap'); if(!page||!cake)return;
+              const layer=document.createElement('div'); layer.className='memory-layer'; layer.innerHTML='<div class="memory-vignette"></div><div class="memory-title"></div><div class="final-ring"></div><div class="final-name">Zwe Htet Myat ❤️</div>'; page.appendChild(layer);
+              const title=layer.querySelector('.memory-title'), ring=layer.querySelector('.final-ring'), name=layer.querySelector('.final-name');
+              let ac;
+              function audio(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)(); if(ac.state==='suspended')ac.resume();}catch(e){}}
+              function tone(f,d=.16,type='sine',gain=.035,delay=0){if(!ac)return;const o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(0,ac.currentTime+delay);g.gain.linearRampToValueAtTime(gain,ac.currentTime+delay+.02);g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+delay+d);o.connect(g).connect(ac.destination);o.start(ac.currentTime+delay);o.stop(ac.currentTime+delay+d+.03)}
+              function chime(){audio();[523.25,659.25,783.99,1046.5].forEach((f,i)=>tone(f,.5,'sine',.045,i*.09));}
+              function whoosh(){audio();tone(180,.45,'sine',.025);tone(90,.6,'triangle',.018,.08)}
+              function burst(){audio();[261.63,329.63,392,523.25,659.25].forEach((f,i)=>tone(f,.35,'sine',.028,i*.045))}
+              function clearTitle(){title.classList.remove('show')}
+              function say(t,ms=0){setTimeout(()=>{title.textContent=t;title.classList.remove('show');void title.offsetWidth;title.classList.add('show')},ms)}
+              function stars(n=30){for(let i=0;i<n;i++){const e=document.createElement('i');e.className='wish-star';e.style.left=(45+Math.random()*10)+'%';e.style.top=(45+Math.random()*20)+'%';e.style.setProperty('--wx',((Math.random()-.5)*70)+'vw');layer.appendChild(e);setTimeout(()=>e.remove(),3400)}}
+              function gifts(){['🎁','🎈','🧸','⭐','💝','🎀'].forEach((x,i)=>{const e=document.createElement('span');e.className='gift';e.textContent=x;e.style.left=(-10+i*7)+'vw';e.style.top=(45+Math.random()*25)+'vh';e.style.animationDelay=(i*.18)+'s';layer.appendChild(e);setTimeout(()=>e.remove(),5500)})}
+              function hearts(){for(let i=0;i<18;i++){const e=document.createElement('span');e.className='heart-spark';e.textContent='❤';e.style.left=(35+Math.random()*30)+'vw';e.style.top=(48+Math.random()*18)+'vh';e.style.animationDelay=(i*.08)+'s';layer.appendChild(e);setTimeout(()=>e.remove(),3000)}}
+              function start(){audio();layer.classList.add('on');cake.style.transition='opacity .8s,transform 1s';cake.style.opacity='.12';
+                say('🎂 ဖယောင်းတိုင်လေးကို မှုတ်ပြီး ဆုတောင်းလိုက်တဲ့အချိန်မှာ...'); chime(); stars(18);
+                setTimeout(()=>{say('✨ ဆုတောင်းချက်လေးဟာ ကြယ်မှုန်လေးတစ်စင်းအဖြစ် ကောင်းကင်ပေါ်ကို ပျံတက်သွားတယ်...');whoosh();stars(34)},7000);
+                setTimeout(()=>{say('🐦 ပျော်ရွှင်မှုနဲ့ လက်ဆောင်လေးတွေကို ငှက်ကလေးတွေက Zwe Htet Myat အတွက် သယ်လာပြီ...');chime();gifts()},16000);
+                setTimeout(()=>{say('🌠 ဒီနေ့တော့ ကောင်းကင်ပေါ်က ကြယ်လေးတွေအားလုံးက မင်းရဲ့ဆုတောင်းချက်ကို ကြားနေကြပြီ... ✨');whoosh();if(typeof shootingStars==='function')shootingStars();stars(20)},27000);
+                setTimeout(()=>{say('🌙 လမင်းနဲ့ ကြယ်တွေက မင်းအတွက်ပဲ လင်းလက်နေကြတာပါ... မင်းရဲ့အိပ်မက်တွေ အမြဲတောက်ပပါစေ။');chime();},39000);
+                setTimeout(()=>{clearTitle();ring.classList.add('show');name.classList.add('show');hearts();burst();gifts();},49000);
+                setTimeout(()=>{say('🎂 ပျော်ရွှင်ဖွယ် မွေးနေ့ပါ Zwe Htet Myat ❤️\n🌈 မင်းရဲ့နေ့ရက်တိုင်း ရယ်မောခြင်း၊ စွန့်စားခန်းအသစ်တွေနဲ့ ပျော်ရွှင်ခြင်းတွေနဲ့ ပြည့်နေပါစေ။ ✨',51000);chime()},51000);
+                setTimeout(()=>{const r=document.querySelector('.restart');if(r){r.classList.add('show');r.textContent='မှော်ကမ္ဘာလေးကို ပြန်စမယ် ✨';r.style.zIndex='90';r.style.pointerEvents='auto'}},57500);
+              }
+              document.addEventListener('click',e=>{if(e.target.closest('.candle')&&!window.__cinematicStarted){window.__cinematicStarted=true;start()}},{capture:true});
+            }; if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
+          })();
+          </script>'''
+          if 'id="cinematic-upgrade"' not in s:s=s.replace('</head>',css+'</head>')
+          if 'id="cinematic-upgrade-js"' not in s:s=s.replace('</body>',js+'</body>')
+          s=s.replace('<html lang="en">','<html lang="my">')
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit upgrade
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet || git commit -m 'Create cinematic birthday journey with sound effects'
+          git push
+      - name: Remove temporary workflow
+        run: |
+          git rm .github/workflows/cinematic-pc-sound.yml
+          git commit -m 'Remove temporary cinematic workflow'
+          git push
